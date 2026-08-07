@@ -1,0 +1,11 @@
+{
+  "name": "mobbin-agent-plugin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
+  }
+}

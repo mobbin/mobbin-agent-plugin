@@ -1,87 +1,59 @@
-# Agent Plugins Example
+# Mobbin Agent Plugin
 
-A copyable reference package for the [Agent Plugins Specification v1.0.0](https://agent-plugins.org/specification).
+The Mobbin Agent Plugin packages Mobbin's hosted MCP server for Agent Plugins 1.0.0 clients. It
+helps agents find real-world UI screens, multi-step flows, and website sections from Mobbin's
+design library.
 
-This repository demonstrates the portable core and includes an Agent Skill that helps migrate existing plugins from client-specific formats. It is a reference example, not a substitute for the normative specification; if they differ, the specification wins.
+## Install
+
+The package is a portable Agent Plugins 1.0.0 directory. Use the installation flow documented by
+your client:
+
+- [VS Code](https://code.visualstudio.com/docs/agent-customization/agent-plugins): install from
+  the marketplace, use **Chat: Install Plugin From Source**, or register a local checkout with
+  `chat.pluginLocations`.
+- [Cursor](https://cursor.com/docs/plugins): install from Customize, or load a local checkout
+  from `~/.cursor/plugins/local/`.
+- [GitHub Copilot](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference):
+  use `copilot plugin install OWNER/REPO` or the documented local/repository flow.
+- [Kiro](https://kiro.dev/docs/powers/installation/): use **Powers → Add Custom Power**.
+- [ChatGPT and Codex](https://developers.openai.com/plugins): install through OpenAI's plugin
+  directory.
+
+Claude Code is not an Agent Plugins-compatible client; use Mobbin's
+[`claude mcp add` setup](https://docs.mobbin.com/mcp/clients/claude-code) instead.
+
+On first use, the client opens a browser for OAuth authorization. You need a Mobbin account on a
+Pro, Team, or Enterprise plan. The plugin contains no API key or other credential.
+
+## What it installs
+
+- The `mobbin` MCP server at `https://api.mobbin.com/mcp` using Streamable HTTP.
+
+The root `plugin.json` and `mcp.json` are the only package configuration files required by the
+Agent Plugins standard.
+
+Mobbin provides these read-only MCP tools:
+
+- `search_screens` — UI screens.
+- `search_flows` — multi-step user journeys such as onboarding and checkout.
+- `search_sections` — website sections such as pricing pages, heroes, and footers.
+
+Results include images, metadata, and links back to Mobbin.
 
 ## Layout
 
 ```text
-agent-plugins-example/
-├── plugin.json                         # Required portable manifest
-├── skills/                             # Portable Agent Skills
-│   └── migrate-agent-plugin/
-│       ├── SKILL.md
-│       └── references/
-│           ├── client-extensions.md
-│           ├── migration-guide.md
-│           └── validation-checklist.md
-├── README.md
-└── LICENSE
-```
-
-The smallest valid plugin needs only `plugin.json`. This example includes a skill so it is useful as well as structurally illustrative.
-
-## The portable core
-
-Agent Plugins v1 defines two portable component types:
-
-- Agent Skills under immediate child directories of `skills/`.
-- MCP servers in an optional root `mcp.json` using the matching v1.0.0 MCP schema.
-
-The root `plugin.json` schema is closed. Do not add `hooks`, `agents`, `commands`, `mcpServers`, `lspServers`, or arbitrary client fields at its top level. Put portable MCP configuration in `mcp.json` and client-owned manifest data inside `extensions`.
-
-See the authoritative documentation for the [plugin manifest](https://agent-plugins.org/plugin-authors/manifest), [skills](https://agent-plugins.org/plugin-authors/skills), [MCP servers](https://agent-plugins.org/plugin-authors/mcp-servers), and [client extensions](https://agent-plugins.org/plugin-authors/client-extensions).
-
-## Add client-specific capabilities safely
-
-Hooks and similar capabilities are not portable v1 components. A client can add them through a reverse-domain extension namespace it owns and documents:
-
-```text
-your-plugin/
+mobbin-agent-plugin/
 ├── plugin.json
-├── skills/
-├── mcp.json                            # Optional portable MCP configuration
-└── com.vendor.client/                  # Optional client extension
-    └── hooks/
-        └── hooks.json
+├── mcp.json
+├── schemas/1.0.0/
+│   ├── plugin.schema.json
+│   └── mcp.schema.json
+├── scripts/
+│   └── validate.mjs
+└── .github/workflows/validate.yml
 ```
 
-If a client uses both manifest data and files, `plugin.json` can contain an extension object:
-
-```json
-{
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "your-plugin",
-  "extensions": {
-    "com.vendor.client": {
-      "settingDefinedByThatClient": true
-    }
-  }
-}
-```
-
-`com.vendor.client` is illustrative. Use only a namespace and fields documented by the client that owns them. Other clients ignore an extension they do not implement, leaving the portable skills and MCP configuration usable.
-
-## Migrate without breaking the existing plugin
-
-Use an additive migration:
-
-1. Add and validate the root `plugin.json` without deleting working platform files.
-2. Move or copy reusable skills into `skills/<skill-name>/SKILL.md`.
-3. Convert portable MCP servers to root `mcp.json` with explicit transport types.
-4. Keep hooks, agents, commands, LSP, UI, and marketplace metadata in a client extension or a separate compatibility package required by that platform.
-5. Test the portable core and every supported client package before removing legacy files.
-
-The included [`migrate-agent-plugin` skill](skills/migrate-agent-plugin/SKILL.md) contains the full migration workflow, artifact mapping, extension strategy, and validation checklist.
-
-## Copy this example
-
-1. Copy this directory and rename it to match your plugin.
-2. Update `name`, `version`, `description`, `author`, and other allowed metadata in `plugin.json`.
-3. Replace the example skill or add more immediate children under `skills/`.
-4. Add `mcp.json` only if the plugin provides MCP servers.
-5. Add client extensions only for namespaces implemented by your target clients.
-6. Validate paths, schemas, skills, and each supported client integration.
-
-The directory name and manifest name do not have to match under the portable specification, but keeping them identical is strongly recommended for predictable packaging and discovery.
+Read the [Mobbin MCP introduction](https://docs.mobbin.com/mcp/introduction) for client setup and
+authorization details.
