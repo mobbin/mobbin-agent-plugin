@@ -160,9 +160,40 @@ function validateConfigSafety(mcp) {
 
 const plugin = await readJson("plugin.json");
 const mcp = await readJson("mcp.json");
+const compatibilityMcp = await readJson(".mcp.json");
 validateSchema("schemas/1.0.0/plugin.schema.json", plugin, "plugin.json");
 validateSchema("schemas/1.0.0/mcp.schema.json", mcp, "mcp.json");
 validateConfigSafety(mcp);
+if (!isObject(compatibilityMcp) || !isObject(compatibilityMcp.mcpServers)) {
+  fail(".mcp.json: mcpServers must be an object");
+} else if (isObject(mcp?.mcpServers)) {
+  const standardServers = mcp.mcpServers;
+  const compatibilityServers = compatibilityMcp.mcpServers;
+  const standardNames = Object.keys(standardServers).sort();
+  const compatibilityNames = Object.keys(compatibilityServers).sort();
+  if (JSON.stringify(standardNames) !== JSON.stringify(compatibilityNames)) {
+    fail(".mcp.json: server names must match mcp.json");
+  }
+  for (const name of standardNames) {
+    const standard = standardServers[name];
+    const compatibility = compatibilityServers[name];
+    if (!isObject(compatibility)) {
+      fail(`.mcp.json: server "${name}" must be an object`);
+      continue;
+    }
+    if (standard.url !== compatibility.url) {
+      fail(`.mcp.json: server "${name}" URL must match mcp.json`);
+    }
+    const transports = {
+      "streamable-http": "http",
+      sse: "sse",
+      stdio: "stdio",
+    };
+    if (transports[standard.type] !== compatibility.type) {
+      fail(`.mcp.json: server "${name}" transport does not correspond to mcp.json`);
+    }
+  }
+}
 await validatePackagePaths();
 
 try {

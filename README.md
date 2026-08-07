@@ -29,6 +29,9 @@ Pro, Team, or Enterprise plan. The plugin contains no API key or other credentia
 - The `mobbin-design-research` skill, which teaches agents when and how to use Mobbin's three
   search tools.
 
+The root `mcp.json` is the standard configuration; `.mcp.json` is a compatibility copy for older
+installers that still probe the dot-prefixed filename.
+
 Mobbin provides these read-only MCP tools:
 
 - `search_screens` — UI screens.
