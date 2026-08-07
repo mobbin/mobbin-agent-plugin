@@ -1,8 +1,8 @@
 # Mobbin Agent Plugin
 
-The Mobbin Agent Plugin packages Mobbin's hosted MCP server and a design-research skill for Agent
-Plugins 1.0.0 clients. It helps agents find real-world UI screens, multi-step flows, and website
-sections from Mobbin's design library.
+The Mobbin Agent Plugin packages Mobbin's hosted MCP server for Agent Plugins 1.0.0 clients. It
+helps agents find real-world UI screens, multi-step flows, and website sections from Mobbin's
+design library.
 
 ## Install
 
@@ -26,8 +26,6 @@ Pro, Team, or Enterprise plan. The plugin contains no API key or other credentia
 ## What it installs
 
 - The `mobbin` MCP server at `https://api.mobbin.com/mcp` using Streamable HTTP.
-- The `mobbin-design-research` skill, which teaches agents when and how to use Mobbin's three
-  search tools.
 
 The root `mcp.json` is the standard configuration; `.mcp.json` is a compatibility copy for older
 installers that still probe the dot-prefixed filename.
@@ -38,8 +36,7 @@ Mobbin provides these read-only MCP tools:
 - `search_flows` — multi-step user journeys such as onboarding and checkout.
 - `search_sections` — website sections such as pricing pages, heroes, and footers.
 
-Results include images, metadata, and links back to Mobbin. Agents should inspect the images before
-recommending references and cite each mentioned screen with its `mobbin_url`.
+Results include images, metadata, and links back to Mobbin.
 
 ## Layout
 
@@ -47,9 +44,6 @@ recommending references and cite each mentioned screen with its `mobbin_url`.
 mobbin-agent-plugin/
 ├── plugin.json
 ├── mcp.json
-├── skills/
-│   └── mobbin-design-research/
-│       └── SKILL.md
 ├── schemas/1.0.0/
 │   ├── plugin.schema.json
 │   └── mcp.schema.json

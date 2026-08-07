@@ -4,7 +4,6 @@ import { readFile, readdir, realpath } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, relative, resolve } from "node:path";
 import process from "node:process";
-import YAML from "yaml";
 
 const require = createRequire(import.meta.url);
 const root = resolve(dirname(new URL(import.meta.url).pathname), "..");
@@ -38,83 +37,6 @@ function validateSchema(schemaPath, data, label) {
 
 function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function validateSkillFrontmatter(path, source) {
-  if (!source.startsWith("---\n")) {
-    fail(`${path}: missing YAML frontmatter`);
-    return;
-  }
-  const end = source.indexOf("\n---", 4);
-  if (end === -1) {
-    fail(`${path}: unterminated YAML frontmatter`);
-    return;
-  }
-
-  let frontmatter;
-  try {
-    frontmatter = YAML.parse(source.slice(4, end));
-  } catch (error) {
-    fail(`${path}: invalid YAML frontmatter: ${error.message}`);
-    return;
-  }
-  if (!isObject(frontmatter)) {
-    fail(`${path}: frontmatter must be a YAML mapping`);
-    return;
-  }
-
-  const allowed = new Set([
-    "name",
-    "description",
-    "license",
-    "compatibility",
-    "metadata",
-    "allowed-tools",
-  ]);
-  for (const key of Object.keys(frontmatter)) {
-    if (!allowed.has(key)) fail(`${path}: unsupported frontmatter field "${key}"`);
-  }
-
-  const skillDir = path.split("/").at(-2);
-  const name = frontmatter.name;
-  if (
-    typeof name !== "string" ||
-    name.length < 1 ||
-    name.length > 64 ||
-    !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(name) ||
-    name.includes("--")
-  ) {
-    fail(`${path}: name must be 1-64 lowercase letters, numbers, and single hyphens`);
-  } else if (name !== skillDir) {
-    fail(`${path}: name must match parent directory "${skillDir}"`);
-  }
-
-  const description = frontmatter.description;
-  if (typeof description !== "string" || description.trim() === "" || description.length > 1024) {
-    fail(`${path}: description must be non-empty and at most 1024 characters`);
-  }
-  if (frontmatter.license !== undefined && typeof frontmatter.license !== "string") {
-    fail(`${path}: license must be a string`);
-  }
-  if (
-    frontmatter.compatibility !== undefined &&
-    (typeof frontmatter.compatibility !== "string" || frontmatter.compatibility.length > 500)
-  ) {
-    fail(`${path}: compatibility must be a string of at most 500 characters`);
-  }
-  if (frontmatter.metadata !== undefined) {
-    if (!isObject(frontmatter.metadata)) fail(`${path}: metadata must be a mapping`);
-    else {
-      for (const [key, value] of Object.entries(frontmatter.metadata)) {
-        if (typeof key !== "string" || typeof value !== "string") {
-          fail(`${path}: metadata keys and values must be strings`);
-        }
-      }
-    }
-  }
-  if (frontmatter["allowed-tools"] !== undefined && typeof frontmatter["allowed-tools"] !== "string") {
-    fail(`${path}: allowed-tools must be a space-separated string`);
-  }
 }
 
 async function validatePackagePaths() {
@@ -196,20 +118,6 @@ if (!isObject(compatibilityMcp) || !isObject(compatibilityMcp.mcpServers)) {
 }
 await validatePackagePaths();
 
-try {
-  for (const entry of await readdir(resolve(root, "skills"), { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const path = `skills/${entry.name}/SKILL.md`;
-    try {
-      validateSkillFrontmatter(path, await readFile(resolve(root, path), "utf8"));
-    } catch (error) {
-      fail(`${path}: ${error.message}`);
-    }
-  }
-} catch (error) {
-  fail(`skills/: ${error.message}`);
-}
-
 if (errors.length > 0) {
   console.error(`FAIL: ${errors.length} validation error${errors.length === 1 ? "" : "s"}`);
   for (const error of errors) console.error(`- ${error}`);
@@ -217,7 +125,6 @@ if (errors.length > 0) {
 } else {
   console.log("PASS: plugin.json schema");
   console.log("PASS: mcp.json schema");
-  console.log("PASS: skill frontmatter");
   console.log("PASS: package path containment");
   console.log("PASS: MCP header credential safety");
   console.log("Validation passed.");
