@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "mobbin",
   "version": "0.1.0",
-  "description": "Search Mobbin's real-world UI design library through MCP and design research guidance.",
+  "description": "Search Mobbin's UI library for screens, flows, and website sections from your agent.",
   "author": {
     "name": "Mobbin",
     "url": "https://mobbin.com"
