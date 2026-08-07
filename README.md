@@ -27,8 +27,9 @@ Pro, Team, or Enterprise plan. The plugin contains no API key or other credentia
 
 - The `mobbin` MCP server at `https://api.mobbin.com/mcp` using Streamable HTTP.
 
-The root `mcp.json` is the standard configuration; `.mcp.json` is a compatibility copy for older
-installers that still probe the dot-prefixed filename.
+The root `plugin.json` and `mcp.json` are the standard configurations. The root `.mcp.json`,
+`.claude-plugin/plugin.json`, and `.codex-plugin/plugin.json` are compatibility copies for current
+installers that still probe client-specific filenames and directories.
 
 Mobbin provides these read-only MCP tools:
 
@@ -44,6 +45,9 @@ Results include images, metadata, and links back to Mobbin.
 mobbin-agent-plugin/
 ├── plugin.json
 ├── mcp.json
+├── .mcp.json
+├── .claude-plugin/plugin.json
+├── .codex-plugin/plugin.json
 ├── schemas/1.0.0/
 │   ├── plugin.schema.json
 │   └── mcp.schema.json

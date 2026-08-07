@@ -83,6 +83,8 @@ function validateConfigSafety(mcp) {
 const plugin = await readJson("plugin.json");
 const mcp = await readJson("mcp.json");
 const compatibilityMcp = await readJson(".mcp.json");
+const claudePlugin = await readJson(".claude-plugin/plugin.json");
+const codexPlugin = await readJson(".codex-plugin/plugin.json");
 validateSchema("schemas/1.0.0/plugin.schema.json", plugin, "plugin.json");
 validateSchema("schemas/1.0.0/mcp.schema.json", mcp, "mcp.json");
 validateConfigSafety(mcp);
@@ -116,6 +118,20 @@ if (!isObject(compatibilityMcp) || !isObject(compatibilityMcp.mcpServers)) {
     }
   }
 }
+for (const [path, compatibilityPlugin] of [
+  [".claude-plugin/plugin.json", claudePlugin],
+  [".codex-plugin/plugin.json", codexPlugin],
+]) {
+  if (!isObject(compatibilityPlugin)) {
+    fail(`${path}: manifest must be an object`);
+    continue;
+  }
+  for (const field of ["name", "version", "description"]) {
+    if (compatibilityPlugin[field] !== plugin?.[field]) {
+      fail(`${path}: ${field} must match plugin.json`);
+    }
+  }
+}
 await validatePackagePaths();
 
 if (errors.length > 0) {
@@ -125,6 +141,7 @@ if (errors.length > 0) {
 } else {
   console.log("PASS: plugin.json schema");
   console.log("PASS: mcp.json schema");
+  console.log("PASS: vendor manifest synchronization");
   console.log("PASS: package path containment");
   console.log("PASS: MCP header credential safety");
   console.log("Validation passed.");
