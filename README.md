@@ -6,19 +6,22 @@ design library.
 
 ## Install
 
-```bash
-npx plugins add mobbin/mobbin-agent-plugin
-```
+The package is a portable Agent Plugins 1.0.0 directory. Use the installation flow documented by
+your client:
 
-Any client that supports Agent Plugins 1.0.0 can load it — ChatGPT and Codex, Cursor, GitHub
-Copilot, Kiro, and VS Code at the specification's launch.
+- [VS Code](https://code.visualstudio.com/docs/agent-customization/agent-plugins): install from
+  the marketplace, use **Chat: Install Plugin From Source**, or register a local checkout with
+  `chat.pluginLocations`.
+- [Cursor](https://cursor.com/docs/plugins): install from Customize, or load a local checkout
+  from `~/.cursor/plugins/local/`.
+- [GitHub Copilot](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference):
+  use `copilot plugin install OWNER/REPO` or the documented local/repository flow.
+- [Kiro](https://kiro.dev/docs/powers/installation/): use **Powers → Add Custom Power**.
+- [ChatGPT and Codex](https://developers.openai.com/plugins): install through OpenAI's plugin
+  directory.
 
-Several clients also offer a native Mobbin setup path that predates this plugin, which stays
-supported: [ChatGPT](https://docs.mobbin.com/mcp/clients/chatgpt),
-[Cursor](https://docs.mobbin.com/mcp/clients/cursor),
-[VS Code](https://docs.mobbin.com/mcp/clients/vscode),
-[Codex CLI](https://docs.mobbin.com/mcp/clients/codex-cli), and
-[others](https://docs.mobbin.com/mcp/clients/other).
+Claude Code is not an Agent Plugins-compatible client; use Mobbin's
+[`claude mcp add` setup](https://docs.mobbin.com/mcp/clients/claude-code) instead.
 
 On first use, the client opens a browser for OAuth authorization. You need a Mobbin account on a
 Pro, Team, or Enterprise plan. The plugin contains no API key or other credential.
@@ -27,9 +30,8 @@ Pro, Team, or Enterprise plan. The plugin contains no API key or other credentia
 
 - The `mobbin` MCP server at `https://api.mobbin.com/mcp` using Streamable HTTP.
 
-The root `plugin.json` and `mcp.json` are the standard configurations. The root `.mcp.json`,
-`.claude-plugin/plugin.json`, and `.codex-plugin/plugin.json` are compatibility copies for current
-installers that still probe client-specific filenames and directories.
+The root `plugin.json` and `mcp.json` are the only package configuration files required by the
+Agent Plugins standard.
 
 Mobbin provides these read-only MCP tools:
 
@@ -45,9 +47,6 @@ Results include images, metadata, and links back to Mobbin.
 mobbin-agent-plugin/
 ├── plugin.json
 ├── mcp.json
-├── .mcp.json
-├── .claude-plugin/plugin.json
-├── .codex-plugin/plugin.json
 ├── schemas/1.0.0/
 │   ├── plugin.schema.json
 │   └── mcp.schema.json

@@ -35,10 +35,6 @@ function validateSchema(schemaPath, data, label) {
   }
 }
 
-function isObject(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
 async function validatePackagePaths() {
   const rootReal = await realpath(root);
   async function walk(path) {
@@ -82,56 +78,9 @@ function validateConfigSafety(mcp) {
 
 const plugin = await readJson("plugin.json");
 const mcp = await readJson("mcp.json");
-const compatibilityMcp = await readJson(".mcp.json");
-const claudePlugin = await readJson(".claude-plugin/plugin.json");
-const codexPlugin = await readJson(".codex-plugin/plugin.json");
 validateSchema("schemas/1.0.0/plugin.schema.json", plugin, "plugin.json");
 validateSchema("schemas/1.0.0/mcp.schema.json", mcp, "mcp.json");
 validateConfigSafety(mcp);
-if (!isObject(compatibilityMcp) || !isObject(compatibilityMcp.mcpServers)) {
-  fail(".mcp.json: mcpServers must be an object");
-} else if (isObject(mcp?.mcpServers)) {
-  const standardServers = mcp.mcpServers;
-  const compatibilityServers = compatibilityMcp.mcpServers;
-  const standardNames = Object.keys(standardServers).sort();
-  const compatibilityNames = Object.keys(compatibilityServers).sort();
-  if (JSON.stringify(standardNames) !== JSON.stringify(compatibilityNames)) {
-    fail(".mcp.json: server names must match mcp.json");
-  }
-  for (const name of standardNames) {
-    const standard = standardServers[name];
-    const compatibility = compatibilityServers[name];
-    if (!isObject(compatibility)) {
-      fail(`.mcp.json: server "${name}" must be an object`);
-      continue;
-    }
-    if (standard.url !== compatibility.url) {
-      fail(`.mcp.json: server "${name}" URL must match mcp.json`);
-    }
-    const transports = {
-      "streamable-http": "http",
-      sse: "sse",
-      stdio: "stdio",
-    };
-    if (transports[standard.type] !== compatibility.type) {
-      fail(`.mcp.json: server "${name}" transport does not correspond to mcp.json`);
-    }
-  }
-}
-for (const [path, compatibilityPlugin] of [
-  [".claude-plugin/plugin.json", claudePlugin],
-  [".codex-plugin/plugin.json", codexPlugin],
-]) {
-  if (!isObject(compatibilityPlugin)) {
-    fail(`${path}: manifest must be an object`);
-    continue;
-  }
-  for (const field of ["name", "version", "description"]) {
-    if (compatibilityPlugin[field] !== plugin?.[field]) {
-      fail(`${path}: ${field} must match plugin.json`);
-    }
-  }
-}
 await validatePackagePaths();
 
 if (errors.length > 0) {
@@ -141,7 +90,6 @@ if (errors.length > 0) {
 } else {
   console.log("PASS: plugin.json schema");
   console.log("PASS: mcp.json schema");
-  console.log("PASS: vendor manifest synchronization");
   console.log("PASS: package path containment");
   console.log("PASS: MCP header credential safety");
   console.log("Validation passed.");
