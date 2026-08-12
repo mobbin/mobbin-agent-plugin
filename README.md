@@ -19,6 +19,8 @@ your client:
 - [Kiro](https://kiro.dev/docs/powers/installation/): use **Powers → Add Custom Power**.
 - [ChatGPT and Codex](https://developers.openai.com/plugins): install through OpenAI's plugin
   directory.
+- [Grok Build](https://github.com/xai-org/plugin-marketplace): open `/plugin`, search for
+  **Mobbin**, and install the plugin.
 
 Claude Code is not an Agent Plugins-compatible client; use Mobbin's
 [`claude mcp add` setup](https://docs.mobbin.com/mcp/clients/claude-code) instead.

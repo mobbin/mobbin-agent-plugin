@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "mobbin": {
+      "type": "http",
+      "url": "https://api.mobbin.com/mcp",
+      "note": "Mobbin's hosted MCP server for searching UI screens, multi-step flows, and website sections. Uses OAuth through the MCP authorization flow."
+    }
+  }
+}
